@@ -72,8 +72,8 @@
         }
 
         .container {
-            width: 100%;
-            max-width: 1250px; /* Mở rộng bảng */
+            width: 98%;
+            max-width: 1400px; /* Nới rộng tối đa để chứa hết chữ */
         }
 
         header {
@@ -211,7 +211,7 @@
             backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            overflow: hidden;
+            overflow-x: auto; /* Cho phép cuộn ngang nếu màn hình nhỏ, tránh bị cắt chữ */
             box-shadow: var(--shadow);
         }
         table {
@@ -221,9 +221,9 @@
             white-space: nowrap; /* Ép chữ trên 1 dòng */
         }
         th, td {
-            padding: 1rem 1.2rem; /* Thu nhỏ padding */
+            padding: 0.8rem 1rem; /* Thu nhỏ padding hơn nữa */
             border-bottom: 1px solid #e2e8f0;
-            font-size: 0.9rem; /* Chữ nhỏ hơn */
+            font-size: 0.85rem; /* Chữ nhỏ thêm 1 chút xíu */
         }
         th {
             background: rgba(17, 43, 91, 0.05);
@@ -268,18 +268,18 @@
         .department-tag {
             background: rgba(17, 43, 91, 0.1);
             color: var(--secondary);
-            padding: 0.25rem 0.7rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             display: inline-block;
         }
 
         /* Status Badge */
         .status-badge {
-            padding: 0.25rem 0.7rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             display: inline-block;
             text-transform: uppercase;
@@ -439,7 +439,7 @@
                             <th>Nhân viên</th>
                             <th>Phòng ban</th>
                             <th class="course-col">Chương trình đào tạo</th>
-                            <th>Ngày Đăng ký</th>
+                            <th>Ngày đăng ký</th>
                             <th>Thời hạn</th>
                             <th>Trạng thái</th>
                         </tr>
