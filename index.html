@@ -290,6 +290,14 @@
             background: rgba(255, 90, 0, 0.15);
             color: var(--primary);
         }
+        .status-badge.cancelled {
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626; /* Red */
+        }
+        tr.cancelled-row {
+            opacity: 0.5;
+            background: rgba(0, 0, 0, 0.02);
+        }
         .status-badge.completed {
             background: rgba(16, 185, 129, 0.15);
             color: #059669; /* Emerald */
@@ -489,6 +497,12 @@
                     table.style.display = "table";
                     emptyState.style.display = "none";
                     
+                    // Sắp xếp: Yêu cầu Đang hoạt động ở trên, Hủy/Hết hạn đẩy xuống dưới
+                    data.registeredList.sort((a, b) => {
+                        if (a.isCancelled === b.isCancelled) return 0;
+                        return a.isCancelled ? 1 : -1;
+                    });
+                    
                     data.registeredList.forEach(user => {
                         let tr = document.createElement('tr');
                         
@@ -526,7 +540,10 @@
                         let statusText = user.status || "Chưa thực hiện";
                         
                         let sLower = statusText.toLowerCase();
-                        if (sLower.indexOf("đang") !== -1) {
+                        if (user.isCancelled || sLower.indexOf("hết hạn") !== -1 || sLower.indexOf("hủy") !== -1 || sLower.indexOf("quá hạn") !== -1) {
+                            badgeClass = "cancelled";
+                            // Tái sử dụng status từ backend (Hết hạn hoặc Hủy)
+                        } else if (sLower.indexOf("đang") !== -1) {
                             badgeClass = "in-progress";
                             isLearning = true;
                         } else if (sLower.indexOf("hoàn thành") !== -1) {
@@ -534,7 +551,21 @@
                             isCompleted = true;
                         }
 
-                        if (user.regDate && user.regDate.trim() !== "") {
+                        if (user.isCancelled) {
+                            tr.className = "cancelled-row";
+                            remainingHTML = `<span class="time-badge done">-</span>`;
+                            
+                            // Vẫn cố parse ngày tháng nếu có để hiển thị ngày đăng ký
+                            if (user.regDate && user.regDate.trim() !== "") {
+                                let d = new Date(user.regDate);
+                                if (!isNaN(d.getTime())) {
+                                    let dd = String(d.getDate()).padStart(2, '0');
+                                    let mm = String(d.getMonth() + 1).padStart(2, '0');
+                                    let yyyy = d.getFullYear();
+                                    regStr = `${dd}/${mm}/${yyyy}`;
+                                }
+                            }
+                        } else if (user.regDate && user.regDate.trim() !== "") {
                             let d = new Date(user.regDate);
                             // Nếu parse thành công
                             if (!isNaN(d.getTime())) {
@@ -609,19 +640,21 @@
             let d2 = new Date(today); d2.setDate(today.getDate() - 20);
             let d3 = new Date(today); d3.setDate(today.getDate() - 42);
             let d4 = new Date(today); d4.setDate(today.getDate() - 10);
+            let d5 = new Date(today); d5.setDate(today.getDate() - 48); // Đã hết hạn
             
             setTimeout(() => {
                 renderData({
                     status: "success",
                     totalSlots: 25,
-                    registeredCount: 5,
-                    remainingSlots: 20,
+                    registeredCount: 4, // 1 bị hủy
+                    remainingSlots: 21,
                     registeredList: [
-                        { regDate: d1.toISOString(), name: "Nguyễn Văn A", department: "IT", course: "Data Science", status: "Chưa thực hiện" },
-                        { regDate: d2.toISOString(), name: "Trần Thị B", department: "HR", course: "Communication Skills", status: "Đang thực hiện" },
-                        { regDate: d3.toISOString(), name: "Lê Hoàng C", department: "Marketing", course: "Digital Marketing", status: "Chưa thực hiện" },
-                        { regDate: "", name: "Phạm D", department: "Sales", course: "", status: "Chưa thực hiện" },
-                        { regDate: d4.toISOString(), name: "Đặng Thị E", department: "Finance", course: "Advanced Excel", status: "Đã hoàn thành" }
+                        { regDate: d1.toISOString(), name: "Nguyễn Văn A", department: "IT", course: "Data Science", status: "Chưa thực hiện", isCancelled: false },
+                        { regDate: d5.toISOString(), name: "Lý Thị F", department: "Design", course: "UI/UX Mastery", status: "Hết hạn", isCancelled: true },
+                        { regDate: d2.toISOString(), name: "Trần Thị B", department: "HR", course: "Communication Skills", status: "Đang thực hiện", isCancelled: false },
+                        { regDate: d3.toISOString(), name: "Lê Hoàng C", department: "Marketing", course: "Digital Marketing", status: "Chưa thực hiện", isCancelled: false },
+                        { regDate: "", name: "Phạm D", department: "Sales", course: "", status: "Chưa thực hiện", isCancelled: false },
+                        { regDate: d4.toISOString(), name: "Đặng Thị E", department: "Finance", course: "Advanced Excel", status: "Đã hoàn thành", isCancelled: false }
                     ]
                 });
             }, 1500);
